@@ -98,6 +98,12 @@ def _create_empty_database(name):
         else:
             cr.autocommit(True)     # avoid transaction block
             cr.execute("""CREATE DATABASE "%s" ENCODING 'unicode' TEMPLATE "%s" """ % (name, chosen_template))
+            if odoo.tools.config['unaccent']:
+                try:
+                    with cr.savepoint():
+                        cr.execute("CREATE EXTENSION unaccent")
+                except psycopg2.Error:
+                    pass                
 
 @check_db_management_enabled
 def exp_create_database(db_name, demo, lang, user_password='admin', login='admin', country_code=None):
